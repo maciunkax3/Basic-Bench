@@ -1,0 +1,2 @@
+rootProject.name = "BasicBench"
+include ':app'
