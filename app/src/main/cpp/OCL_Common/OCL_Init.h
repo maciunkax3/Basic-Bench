@@ -9,6 +9,7 @@ namespace OCL{
     public:
         Runtime(int &status);
         uint64_t getKernelExecutionTime(cl_event event);
+        uint64_t getLatencyTime(cl_event event);
         cl_platform_id cpPlatform;
         cl_device_id device_id;
         std::unique_ptr<Context> context;

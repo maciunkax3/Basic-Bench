@@ -91,7 +91,7 @@ double FlopsMesurement::runTest(DataTypes type, TestType testType) {
 
     auto vecotrSize = 1 << ((int) (type) % 5);
     if (testType == TestType::Mesurement) {
-        bufferSize *= vecotrSize;
+        bufferSize *= 128;
     }
     auto buffer = std::make_unique<OCL::Buffer>(runtime->context.get(),
                                                 bufferSize, nullptr);
@@ -105,7 +105,7 @@ double FlopsMesurement::runTest(DataTypes type, TestType testType) {
     }
 
     kernel->setArg<cl_mem>(0, &buffer->memObj);
-    kernel->gws[0] = size;
+    kernel->gws[0] = (size * (testType == TestType::Mesurement ? 128 : 1)) / vecotrSize;
     kernel->lws[0] = runtime->maxWG;
     kernel->dims = 1;
     kernel->setArg<cl_mem>(0, &buffer->memObj);
@@ -128,6 +128,39 @@ double FlopsMesurement::runTest(DataTypes type, TestType testType) {
         result = (size * iterations * operationCount) / time;
     }
     return result;
+}
+
+double FlopsMesurement::runLatency() {
+    const char *program = R"===(
+    __kernel void hello_opencl(__global char *dst){
+        uint gid = get_global_id(0);
+        dst[gid]++;
+    }
+    )===";
+    auto kernel = std::make_unique<OCL::Kernel>(runtime->context.get(), program, "hello_opencl",
+                                                "");
+    auto queue = std::make_unique<OCL::Queue>(runtime);
+    auto buffer = std::make_unique<OCL::Buffer>(runtime->context.get(), 100, nullptr);
+
+    kernel->gws[0] = 32;
+    kernel->lws[0] = 32;
+    kernel->dims = 1;
+    kernel->setArg<cl_mem>(0, &buffer->memObj);
+    kernel->createEvent();
+
+    queue->runKernel(kernel.get());
+    queue->runKernel(kernel.get());
+    queue->waitForExecutionFinish();
+
+    auto iters = 4096;
+    double time = 0.0;
+    for(int i = 0; i < iters ; i++){
+        queue->runKernel(kernel.get());
+        queue->waitForExecutionFinish();
+        time += (double) (runtime->getLatencyTime(kernel->event));
+    }
+
+    return time/(double)(iters);
 }
 
 const char *FlopsMesurement::getProgramSource(DataTypes type) {

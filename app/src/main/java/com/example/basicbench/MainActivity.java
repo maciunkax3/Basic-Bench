@@ -15,7 +15,6 @@ import android.widget.TextView;
 import com.example.basicbench.databinding.ActivityMainBinding;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -66,6 +65,27 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 runBandwith();
             }
         });
+        Button bt5 = (Button)findViewById(R.id.button5);
+        bt5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                runLatency();
+            }
+        });
+        Button bt4 = (Button)findViewById(R.id.button4);
+        bt4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                runReadWrite();
+            }
+        });
+        Button bt3 = (Button)findViewById(R.id.button3);
+        bt3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tv.setText(runMatrixMul());
+            }
+        });
         // Example of a call to a native method
     }
     @Override
@@ -86,6 +106,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public native void closeOCL();
     public native double runFlopsTest(int dataType);
     public native double runBandwith(int dataType);
+    public native double runReadBuffer();
+    public native double runWriteBuffer();
+    public native double runMapBuffer();
+    public native double runUnMapBuffer();
+    public native double runOCLLatency();
+    public native String runMatrixMul();
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -125,6 +151,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         }
         tv.setText(text + ": "+ Double.toString(result));
+    }
+    public void runLatency(){
+        double result = 0.0;
+        result = runOCLLatency();
+        String text = "Latency: ";
+        tv.setText(text + Double.toString(result));
+    }
+    public void runReadWrite(){
+        double result = 0.0;
+        result = runReadBuffer();
+        String text = "clEnqueueReadBuffer: " + Double.toString(result) + " Mb/s\n";
+        result = runWriteBuffer();
+        text += "clEnqueueWriteBuffer: " + Double.toString(result) + " Mb/s\n";
+        result = runMapBuffer();
+        text += "clEnqueueMapBuffer: " + Double.toString(result) + " Mb/s\n";
+        result = runUnMapBuffer();
+        text += "clEnqueueUnMapBuffer: " + Double.toString(result) + " Mb/s\n";
+        tv.setText(text);
     }
 
 }

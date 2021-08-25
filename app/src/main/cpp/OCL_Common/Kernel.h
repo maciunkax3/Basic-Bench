@@ -1,6 +1,7 @@
 #pragma once
 #include <CL/cl.h>
 #include <string>
+#include <log.h>
 
 namespace OCL{
     class Context;
@@ -10,7 +11,8 @@ namespace OCL{
         ~Kernel();
         template <typename T>
         void setArg(uint32_t index, void* argVal){
-            clSetKernelArg(kernel, index, sizeof(T), argVal);
+            auto err = clSetKernelArg(kernel, index, sizeof(T), argVal);
+            LOGI("Set Kernel arg: %d", err);
         }
         void createEvent();
         cl_program program = nullptr;

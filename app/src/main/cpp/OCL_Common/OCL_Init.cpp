@@ -58,4 +58,15 @@ namespace OCL{
 
         return end - start;
     }
+    uint64_t Runtime::getLatencyTime(cl_event event) {
+        uint64_t start = 0;
+        uint64_t end = 0;
+        size_t copySize;
+        clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_QUEUED, sizeof(start), &start, &copySize);
+        LOGI("ref of Profiling Info start:%d\n",start);
+        clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_START, sizeof(end), &end, &copySize);
+        LOGI("ref of Profiling Info end:%d\n",end);
+
+        return end - start;
+    }
 }
