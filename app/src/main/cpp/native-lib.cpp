@@ -9,6 +9,7 @@
 #include "log.h"
 #include "DataTypesEnum.h"
 #include "flops_mesrement.h"
+#include <algorithm>
 
 OCL::Runtime *runtime = nullptr;
 FlopsMesurement *flopsMesurement = nullptr;
@@ -87,7 +88,7 @@ extern "C"
 JNIEXPORT jdouble JNICALL
 Java_com_example_basicbench_MainActivity_runBandwith(JNIEnv *env, jobject thiz, jint data_type) {
     DataTypes type = (DataTypes) (data_type);
-    double result = flopsMesurement->runTest(type, TestType::Mesurement);
+    double result = flopsMesurement->runTest(type, TestType::Bandwith);
     return result;
 }
 extern "C"
@@ -125,22 +126,28 @@ Java_com_example_basicbench_MainActivity_runWriteBuffer(JNIEnv *env, jobject thi
     auto event = clCreateUserEvent(runtime->context.get()->context, NULL);
     auto size = 1024 * 1024 * 10;
     auto buffer = std::make_unique<OCL::Buffer>(runtime->context.get(), size, nullptr);
-    auto mem = std::make_unique<uint8_t[]>(size);
-    memset(mem.get(), 45, size);
+    auto memSrc = std::make_unique<uint8_t[]>(size);
+    auto memDst = std::make_unique<uint8_t[]>(size);
+    memset(memSrc.get(), 45, size);
     auto iters = 256;
 
-    clEnqueueWriteBuffer(queue->queue, buffer->memObj, false, 0, size, mem.get(), 0, nullptr,
+    clEnqueueWriteBuffer(queue->queue, buffer->memObj, false, 0, size, memSrc.get(), 0, nullptr,
                          &event);
-    clEnqueueWriteBuffer(queue->queue, buffer->memObj, false, 0, size, mem.get(), 0, nullptr,
+    clEnqueueWriteBuffer(queue->queue, buffer->memObj, false, 0, size, memSrc.get(), 0, nullptr,
                          &event);
     queue->waitForExecutionFinish();
     double time = 0.0;
     for (int i = 0; i < iters; i++) {
-        clEnqueueWriteBuffer(queue->queue, buffer->memObj, false, 0, size, mem.get(), 0, nullptr,
+        clEnqueueWriteBuffer(queue->queue, buffer->memObj, false, 0, size, memSrc.get(), 0, nullptr,
                              &event);
         queue->waitForExecutionFinish();
         double timeNs = runtime->getKernelExecutionTime(event);
         time += timeNs / (1000 * 1000 * 1000);
+        //buffer->toHost(queue.get(), memDst.get());
+        //queue->waitForExecutionFinish();
+        //LOGI("0: %d, 1024: %d, 1024 * 1024 - 1: %d\n", memDst[0], memDst[sizeof(int) * 1024],
+        //     memDst[(sizeof(int) * (1024 * 1024 - 1))]);
+        //memset(memSrc.get(), 45+ i, size);
     }
     return (10.0 * iters) / time;
 }extern "C"
@@ -198,8 +205,8 @@ Java_com_example_basicbench_MainActivity_runUnMapBuffer(JNIEnv *env, jobject thi
 }extern "C"
 JNIEXPORT jstring JNICALL
 Java_com_example_basicbench_MainActivity_runMatrixMul(JNIEnv *env, jobject thiz) {
-    int sizeN = runtime->maxWG;
-    int sizeM = runtime->maxWG;
+    int sizeN = std::max(runtime->maxWG, (size_t)1024);
+    int sizeM = std::max(runtime->maxWG, (size_t)1024);
     auto bufferA = std::make_unique<OCL::Buffer>(runtime->context.get(),
                                                  sizeN * sizeM * sizeof(int), nullptr);
     auto bufferB = std::make_unique<OCL::Buffer>(runtime->context.get(),

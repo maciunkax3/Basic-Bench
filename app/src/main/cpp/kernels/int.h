@@ -27,7 +27,7 @@ const char *int2Program = R"===(
 #define MAD_16(x, y)    MAD_4(x, y);        MAD_4(x, y);        MAD_4(x, y);        MAD_4(x, y);
 #define MAD_64(x, y)    MAD_16(x, y);       MAD_16(x, y);       MAD_16(x, y);       MAD_16(x, y);
 
-__kernel void Int2(__global int *ptr, int _in)
+__kernel void Int2(__global int2 *ptr, int _in)
 {
     int in = (int)_in;
     int2 x = (int2)(in, in);
@@ -48,7 +48,7 @@ const char *int4Program = R"===(
 #define MAD_16(x, y)    MAD_4(x, y);        MAD_4(x, y);        MAD_4(x, y);        MAD_4(x, y);
 #define MAD_64(x, y)    MAD_16(x, y);       MAD_16(x, y);       MAD_16(x, y);       MAD_16(x, y);
 
-__kernel void Int4(__global int *ptr, int _in)
+__kernel void Int4(__global int4 *ptr, int _in)
 {
     int in = (int)_in;
     int4 x = (int4)(in, in, in, in);
@@ -69,7 +69,7 @@ const char *int8Program = R"===(
 #define MAD_16(x, y)    MAD_4(x, y);        MAD_4(x, y);        MAD_4(x, y);        MAD_4(x, y);
 #define MAD_64(x, y)    MAD_16(x, y);       MAD_16(x, y);       MAD_16(x, y);       MAD_16(x, y);
 
-__kernel void Int8(__global int *ptr, int _in)
+__kernel void Int8(__global int8 *ptr, int _in)
 {
     int in = (int)_in;
     int8 x = (int8)(in, in, in, in, in, in, in, in);
@@ -90,7 +90,7 @@ const char *int16Program = R"===(
 #define MAD_16(x, y)    MAD_4(x, y);        MAD_4(x, y);        MAD_4(x, y);        MAD_4(x, y);
 #define MAD_64(x, y)    MAD_16(x, y);       MAD_16(x, y);       MAD_16(x, y);       MAD_16(x, y);
 
-__kernel void Int16(__global int *ptr, int _in)
+__kernel void Int16(__global int16 *ptr, int _in)
 {
     int in = (int)_in;
     int16 x = (int16)(in, in, in, in, in, in, in, in, in, in, in, in, in, in, in, in);

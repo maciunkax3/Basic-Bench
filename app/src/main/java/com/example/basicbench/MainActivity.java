@@ -131,13 +131,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         String text = spinner.getSelectedItem().toString();
         DataTypes type;
         double flops = 0.0;
+        int typeOrdinal = 0;
         for(Map.Entry<DataTypes, String> entry: DataTypesMap.dataTypesStringmap.entrySet()){
             if(text.compareTo(entry.getValue()) == 0){
-                flops = runFlopsTest((entry.getKey().ordinal()));
+                typeOrdinal = (entry.getKey().ordinal());
+                flops = runFlopsTest(typeOrdinal);
                 break;
             }
         }
-        tv.setText(text + ": "+ Double.toString(flops));
+        String typeString = "";
+        if(typeOrdinal / 5 == 0){
+            typeString = "HLOPS";
+        } else if(typeOrdinal / 5== 1){
+            typeString = "ILOPS";
+        } else if(typeOrdinal / 5== 2){
+            typeString = "FLOPS";
+        } else if(typeOrdinal / 5== 3){
+            typeString = "DLOPS";
+        }
+        tv.setText(text + ": "+ Double.toString(flops/(1024*1024*1024)) + " G" + typeString);
     }
     public void runBandwith(){
         Spinner spinner = (Spinner)findViewById(R.id.spinner3);
@@ -150,25 +162,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 break;
             }
         }
-        tv.setText(text + ": "+ Double.toString(result));
+        tv.setText(text + ": "+ Double.toString(result/(1024.0 * 1024.0 * 1024.0)) + " GB/s");
     }
     public void runLatency(){
         double result = 0.0;
         result = runOCLLatency();
         String text = "Latency: ";
-        tv.setText(text + Double.toString(result));
+        tv.setText(text + Double.toString(result) + " ns");
     }
-    public void runReadWrite(){
+    public void runReadWrite() {
         double result = 0.0;
         result = runReadBuffer();
-        String text = "clEnqueueReadBuffer: " + Double.toString(result) + " Mb/s\n";
+        String text = "clEnqueueReadBuffer: " + Double.toString(result / 1024.0) + " GB/s\n";
         result = runWriteBuffer();
-        text += "clEnqueueWriteBuffer: " + Double.toString(result) + " Mb/s\n";
+        text += "clEnqueueWriteBuffer: " + Double.toString(result / 1024.0) + " GB/s\n";
         result = runMapBuffer();
-        text += "clEnqueueMapBuffer: " + Double.toString(result) + " Mb/s\n";
+        text += "clEnqueueMapBuffer: " + Double.toString(result / 1024.0) + " GB/s\n";
         result = runUnMapBuffer();
-        text += "clEnqueueUnMapBuffer: " + Double.toString(result) + " Mb/s\n";
+        text += "clEnqueueUnMapBuffer: " + Double.toString(result / 1024.0) + " GB/s\n";
         tv.setText(text);
     }
-
 }

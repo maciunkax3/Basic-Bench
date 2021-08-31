@@ -90,14 +90,14 @@ double FlopsMesurement::runTest(DataTypes type, TestType testType) {
     };
 
     auto vecotrSize = 1 << ((int) (type) % 5);
-    if (testType == TestType::Mesurement) {
+    if (testType == TestType::Bandwith) {
         bufferSize *= 128;
     }
     auto buffer = std::make_unique<OCL::Buffer>(runtime->context.get(),
                                                 bufferSize, nullptr);
     auto bufferSrc = std::make_unique<OCL::Buffer>(runtime->context.get(),
                                                    bufferSize, nullptr);
-    if (testType == TestType::Mesurement) {
+    if (testType == TestType::Bandwith) {
         kernel->setArg<cl_mem>(1, &bufferSrc->memObj);
         auto initMem = std::make_unique<char[]>(bufferSize);
         memset(initMem.get(), 12, bufferSize);
@@ -105,7 +105,7 @@ double FlopsMesurement::runTest(DataTypes type, TestType testType) {
     }
 
     kernel->setArg<cl_mem>(0, &buffer->memObj);
-    kernel->gws[0] = (size * (testType == TestType::Mesurement ? 128 : 1)) / vecotrSize;
+    kernel->gws[0] = (size * (testType == TestType::Bandwith ? 128 : 1)) / vecotrSize;
     kernel->lws[0] = runtime->maxWG;
     kernel->dims = 1;
     kernel->setArg<cl_mem>(0, &buffer->memObj);
@@ -121,11 +121,11 @@ double FlopsMesurement::runTest(DataTypes type, TestType testType) {
         time += (double) (runtime->getKernelExecutionTime(kernel->event)) * 0.000000001;
     }
     double result = 0.0;
-    if (testType == TestType::Mesurement) {
+    if (testType == TestType::Bandwith) {
         result = (iterations * bufferSize) / time;
     } else {
         uint32_t operationCount = 4096;
-        result = (size * iterations * operationCount) / time;
+        result = (size/vecotrSize * iterations * operationCount) / time;
     }
     return result;
 }

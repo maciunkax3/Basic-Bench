@@ -24,5 +24,5 @@ enum DataTypes {
 };
 enum TestType{
     Flops,
-    Mesurement,
+    Bandwith,
 };
