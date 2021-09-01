@@ -52,9 +52,9 @@ namespace OCL{
         uint64_t end = 0;
         size_t copySize;
         clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_START, sizeof(start), &start, &copySize);
-        LOGI("ref of Profiling Info start:%d\n",start);
+        //LOGI("ref of Profiling Info start:%d\n",start);
         clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_END, sizeof(end), &end, &copySize);
-        LOGI("ref of Profiling Info end:%d\n",end);
+        //LOGI("ref of Profiling Info end:%d\n",end);
 
         return end - start;
     }
@@ -63,9 +63,9 @@ namespace OCL{
         uint64_t end = 0;
         size_t copySize;
         clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_QUEUED, sizeof(start), &start, &copySize);
-        LOGI("ref of Profiling Info start:%d\n",start);
+        //LOGI("ref of Profiling Info start:%d\n",start);
         clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_START, sizeof(end), &end, &copySize);
-        LOGI("ref of Profiling Info end:%d\n",end);
+        //LOGI("ref of Profiling Info end:%d\n",end);
 
         return end - start;
     }

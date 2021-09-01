@@ -16,7 +16,7 @@ namespace OCL {
         } else{
             memObj = clCreateBuffer(context->context, CL_MEM_READ_WRITE , size, nullptr, &err);
         }
-        LOGI("ref of clBufferCreate:%d\n", err);
+        //LOGI("ref of clBufferCreate:%d\n", err);
     }
 
     Buffer::~Buffer() {

@@ -12,7 +12,7 @@ namespace OCL{
         template <typename T>
         void setArg(uint32_t index, void* argVal){
             auto err = clSetKernelArg(kernel, index, sizeof(T), argVal);
-            LOGI("Set Kernel arg: %d", err);
+            //LOGI("Set Kernel arg: %d", err);
         }
         void createEvent();
         cl_program program = nullptr;

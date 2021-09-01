@@ -14,5 +14,6 @@ namespace OCL{
         void waitForExecutionFinish();
         void copyBufferToBuffer(Buffer *src, Buffer *dst, size_t size, cl_event *event);
         cl_command_queue queue;
+        bool nullLws = false;
     };
 }

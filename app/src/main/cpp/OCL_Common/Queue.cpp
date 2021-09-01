@@ -8,7 +8,7 @@ namespace OCL{
     Queue::Queue(Runtime *runtime){
         cl_int err = -1;
         queue = clCreateCommandQueue(runtime->context->context, runtime->device_id, CL_QUEUE_PROFILING_ENABLE, &err);
-        LOGI("ref of clCreateCommandQueue:%d\n",err);
+        //LOGI("ref of clCreateCommandQueue:%d\n",err);
     }
 
     Queue::~Queue() {
@@ -17,8 +17,8 @@ namespace OCL{
 
     void Queue::runKernel(Kernel *kernel) {
         cl_int err = -1;
-        err = clEnqueueNDRangeKernel(queue, kernel->kernel, kernel->dims, NULL, kernel->gws, kernel->lws, 0, nullptr, kernel->event ? &kernel->event :nullptr);
-        LOGI("ref of clGetDeviceInfo:%d\n",err);
+        err = clEnqueueNDRangeKernel(queue, kernel->kernel, kernel->dims, NULL, kernel->gws,nullLws? nullptr : kernel->lws, 0, nullptr, kernel->event ? &kernel->event :nullptr);
+        //LOGI("ref of clGetDeviceInfo:%d\n",err);
     }
 
     void Queue::flushKernels() {

@@ -51,7 +51,7 @@ Java_com_example_basicbench_MainActivity_initOCL(JNIEnv *env, jobject thiz) {
     if (runtime == nullptr) {
         int status;
         runtime = new OCL::Runtime(status);
-        LOGI("Runtime create: %d\n", status);
+        //LOGI("Runtime create: %d\n", status);
     }
     flopsMesurement = new FlopsMesurement();
     flopsMesurement->initMap();
@@ -267,9 +267,22 @@ Java_com_example_basicbench_MainActivity_runMatrixMul(JNIEnv *env, jobject thiz)
         auto memory = std::make_unique<uint8_t[]>(sizeN * sizeN * sizeof(int));
         bufferDst->toHost(queue.get(), memory.get());
         queue->waitForExecutionFinish();
-        LOGI("0: %d, 1024: %d, 1024 * 1024 - 1: %d\n", memory[0], memory[sizeof(int) * 1024],
-             memory[(sizeof(int) * (1024 * 1024 - 1))]);
+        //LOGI("0: %d, 1024: %d, 1024 * 1024 - 1: %d\n", memory[0], memory[sizeof(int) * 1024],
+             //memory[(sizeof(int) * (1024 * 1024 - 1))]);
 
     }
+    queue->nullLws = true;auto time = 0.0;
+    for (int i = 0; i < iters; i++) {
+        queue->runKernel(kernel.get());
+        queue->waitForExecutionFinish();
+        time += (double) (runtime->getKernelExecutionTime(kernel->event)) * 0.000000001;
+    }
+    time /= iters;
+    output.append("Matrix mul lws: ");
+    output.append("nullptr");
+    output.append(" time: ");
+    output.append(std::to_string(time));
+    output.append("\n");
+    queue->nullLws=false;
     return env->NewStringUTF(output.c_str());
 }
