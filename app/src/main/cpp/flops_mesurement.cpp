@@ -105,7 +105,7 @@ double FlopsMesurement::runTest(DataTypes type, TestType testType) {
     }
 
     kernel->setArg<cl_mem>(0, &buffer->memObj);
-    kernel->gws[0] = (size * (testType == TestType::Bandwith ? 128 : 1)) / vecotrSize;
+    kernel->gws[0] = (size * (testType == TestType::Bandwith ? (128/vecotrSize) : 1));
     kernel->lws[0] = runtime->maxWG;
     kernel->dims = 1;
     kernel->setArg<cl_mem>(0, &buffer->memObj);
@@ -125,7 +125,7 @@ double FlopsMesurement::runTest(DataTypes type, TestType testType) {
         result = (iterations * bufferSize) / time;
     } else {
         uint32_t operationCount = 4096;
-        result = (size/vecotrSize * iterations * operationCount) / time;
+        result = (size * iterations * operationCount) / time;
     }
     return result;
 }
